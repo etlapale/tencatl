@@ -1,0 +1,24 @@
+language: cpp
+addons:
+  apt:
+    sources:
+      - llvm-toolchain-precise-3.9
+      - ubuntu-toolchain-r-test
+      - george-edison55-precise-backports
+    packages:
+      - clang-3.9
+      - cmake
+      - cmake-data
+      - g++-5
+      - gcc-5
+install:
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5"; fi
+  - if [ "$CXX" = "clang++" ]; then export CXX="clang++-3.9" CC="clang-3.9"; fi
+compiler:
+  - clang
+  - gcc
+before_script:
+  - cmake -DCMAKE_BUILD_TYPE=Debug .
+script:
+  - make VERBOSE=1
+  - make install
