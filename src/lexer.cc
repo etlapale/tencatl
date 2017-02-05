@@ -8,7 +8,7 @@
 
 namespace tencatl {
 
-static const std::string allowed_symbols("()[]:");
+static const std::string allowed_symbols("()[]:,");
 
 static bool isvarstart(char c)
 {
@@ -33,6 +33,54 @@ static bool isop(char c)
 }
 
 
+std::ostream& operator<<(std::ostream& os, Token token)
+{
+  switch (token) {
+  case Token::NoToken:
+    os << "NoToken";
+    break;
+  case Token::Double:
+    os << "Double";
+    break;
+  case Token::Long:
+    os << "Long";
+    break;
+  case Token::Int:
+    os << "Int";
+    break;
+  case Token::String:
+    os << "String";
+    break;
+  case Token::Variable:
+    os << "Variable";
+    break;
+  case Token::Symbol:
+    os << "Symbol";
+    break;
+  case Token::Operator:
+    os << "Operator";
+    break;
+  case Token::EndOfExpression:
+    os << "EndOfExpression";
+    break;
+  case Token::BlockBegin:
+    os << "BlockBegin";
+    break;
+  case Token::BlockEnd:
+    os << "BlockEnd";
+    break;
+  case Token::EndOfFile:
+    os << "EndOfFile";
+    break;
+  default:
+    os << "???";
+    break;
+  }
+  
+  return os;
+}
+
+
 Lexer::Lexer(const std::string& path)
   : is(new std::ifstream(path))
 {
@@ -53,7 +101,8 @@ Lexer::Lexer(const std::string& path)
 char Lexer::get_char()
 {
   is->get(c);
-  //std::cout << "  << Read ‘" << c << "’" << std::endl;
+  std::cout << "  << Read ‘" << c << "’ ("
+	    << static_cast<int>(c) << ")" << std::endl;
   return c;
 }
 
@@ -93,22 +142,31 @@ Token Lexer::read_token()
     }
 
   // Skip whitespaces
-  while (!bol && isblank(c))
+  while (! is->eof() && !bol && isblank(c))
     get_char();
   
   // Skip empty lines
-  if (bol && c == '\n')
+  if (! is->eof() && bol && c == '\n')
     get_char();
 
   // Close all the indentation blocks
   if (indent.size()
-      && ((bol && c != ' ') || (is->eof() && indent.size()))) {
+      && ((bol && c != ' ') || is->eof())) {
     closing_blocks = indent.size();
     
     while (indent.size()) indent.pop();
     bol = false;
     
     return read_token();
+  }
+    
+  // Handle end of files
+  if (is->eof()) {
+    // Ensure that applications do not try to read passed the EOF
+    if (eofed)
+      throw std::runtime_error("trying to get a token after the end of file");
+    eofed = true;
+    return last_token = Token::EndOfFile;
   }
   
   // Indentation: only spaces
@@ -249,19 +307,61 @@ Token Lexer::read_token()
     return last_token = Token::Operator;
   }
   
-  // Handle end of files
-  if (is->eof()) {
-    // Ensure that applications do not try to read passed the EOF
-    if (eofed)
-      throw std::runtime_error("trying to get a token after the end of file");
-    eofed = true;
-    return last_token = Token::EndOfFile;
-  }
-  
   // Single line comments start with ‘#’ and go to end of line
   if (c == '#')
     while (get_char() != '\n');
 
+  // Start of string literal
+  if (c == '"') {
+    std::stringstream buf;
+    while (get_char() != '"') {
+      // Escape character
+      if (c == '\\') {
+	switch (get_char()) {
+	case '\\':
+	  buf << '\\';
+	  break;
+	case 'n':
+	  buf << '\n';
+	  break;
+	case 'r':
+	  buf << '\r';
+	  break;
+	case 't':
+	  buf << '\t';
+	  break;
+	default:
+	  throw std::runtime_error(std::string("unknown escape code ‘")
+				   + c + "’");
+	}
+      }
+      else {
+	buf << c;
+      }
+    }
+    get_char ();
+    
+    // Check for docstrings or similar multi-line strings
+    if (c == '"' && buf.tellg() == 0) {
+      get_char();
+      char count = 0;
+      while (count != 3) {
+	if (c == -1)
+	  throw std::runtime_error("unexpected end of file while scanning string");
+	buf << c;
+	if (c == '"')
+	  count++;
+	get_char ();
+      }
+
+      last_string = buf.str();
+      return last_token = Token::String;
+    }
+
+    last_string = buf.str();
+    return last_token = Token::String;
+  }
+  
   // End of line
   if (c == '\n') {
     bol = true;

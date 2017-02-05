@@ -36,6 +36,9 @@ if (NOT ${BUILD_STATIC_LIBS} AND NOT ${BUILD_SHARED_LIBS})
   warning(FATAL_ERROR "both shared and static libraries are disabled")
 endif ()
 
+# Dependencies
+find_package(Boost COMPONENTS unit_test_framework REQUIRED)
+
 # Convenience macro to build the libraries
 macro(add_tencatl_lib NAME SRC)
   # Prefix all library names
@@ -62,7 +65,9 @@ add_tencatl_lib(lexer src/lexer.cc)
 add_executable(lexer-printer src/lexer-printer.cc)
 target_link_libraries(lexer-printer lexer)
 
+# Unit tests
 enable_testing()
+add_subdirectory(tests)
 
 # Install the headers
 install(DIRECTORY include/tencatl

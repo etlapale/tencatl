@@ -27,6 +27,9 @@ int main(int argc, char* argv[])
     case Token::Int:
       std::cout << prefix << "<int>" << lexer.int_value() << "</int>" << std::endl;
       break;
+    case Token::String:
+      std::cout << prefix << "<str>" << lexer.string() << "</str>" << std::endl;
+      break;
     case Token::Variable:
       std::cout << prefix << "<var>" << lexer.variable_name() << "</var>" << std::endl;
       break;
@@ -44,6 +47,8 @@ int main(int argc, char* argv[])
       break;
     case Token::BlockEnd:
       prefix = prefix.substr(2);
+      break;
+    case Token::EndOfFile:
       break;
     default:
       std::cerr << "Unknown token!" << std::endl;

@@ -11,6 +11,7 @@ enum class Token {
   Double,
   Long,
   Int,
+  String,
   Variable,
   Symbol,
   Operator,
@@ -19,6 +20,8 @@ enum class Token {
   BlockEnd,
   EndOfFile
 };
+
+std::ostream& operator<<(std::ostream& os, Token token);
 
 class Lexer
 {
@@ -49,6 +52,9 @@ public:
   
   double float_value() const
   { return last_float; }
+
+  const std::string& string() const
+  { return last_string; }
   
 private:
   //// Input stream.
@@ -78,6 +84,7 @@ private:
   /// Name of the last variable token.
   std::string last_var;
   std::string last_oper;
+  std::string last_string;
     /// Name of the last variable token.
   char last_sym;
   double last_float;
