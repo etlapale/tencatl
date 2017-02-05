@@ -74,7 +74,7 @@ Token Lexer::read_token()
 	throw std::runtime_error("invalid token in to-emit queue");
       }
     to_emit.pop();
-    return tok;
+    return last_token = tok;
   }
 
   // Closing blocks
@@ -88,7 +88,7 @@ Token Lexer::read_token()
 	skipped_blocks--;
       }
       else {
-	return Token::BlockEnd;
+	return last_token = Token::BlockEnd;
       }
     }
 
@@ -136,7 +136,7 @@ Token Lexer::read_token()
 	  // Emit an EndOfExpression on BlockEnd if necessary
 	  if (maybe_expend) {
 	    maybe_expend = false;
-	    to_emit.push(Token::BlockBegin);
+	    to_emit.push(Token::EndOfExpression);
 	  }
 	  
 	  return read_token();
@@ -153,7 +153,58 @@ Token Lexer::read_token()
     }
   }
   bol = false;
+  
+  // Number litterals
+  if (std::isdigit(c) || c == '.') {
 
+    auto first_char = c;
+    std::stringstream buf;
+    
+    bool dotted = false;
+    while (std::isdigit(c) || ((!dotted) && c == '.')) {
+      dotted = dotted || (c == '.');
+      buf << c;
+      get_char();
+    }
+
+    // Just a dot
+    if (buf.tellg() == 1 && first_char == '.') {
+      last_sym = '.';
+      return last_token = Token::Symbol;
+    }
+
+    // Hexadecimal numbers (starting with 0x)
+    int base = 10;
+    if (buf.tellg () == 1 && first_char == '0' && c == 'x') {
+      base = 16;
+      while (isxdigit(get_char()))
+	buf << c;
+    }
+    
+    // Long integers ends with `L'
+    bool is_long = false;
+    if (!dotted && c == 'L') {
+      is_long = true;
+      get_char();
+    }
+
+    auto lit = buf.str();
+    
+    // Check the number type
+    if (dotted) {
+      last_float = std::stod(lit);
+      return Token::Double;
+    }
+    else if (is_long) {
+      last_int = std::stol(lit);
+      return Token::Long;
+    }
+    else {
+      last_int = std::stoi(lit);
+      return Token::Int;
+    }
+  }
+  
   // Potential variable
   if (isvarstart(c)) {
     // Read the potential variable
@@ -207,8 +258,16 @@ Token Lexer::read_token()
     
     // Avoid generating empty expressions
     if (last_token == Token::NoToken
-	|| last_token == Token::EndOfExpression)
+	|| last_token == Token::EndOfExpression
+	|| last_token == Token::BlockBegin
+	|| last_token == Token::BlockEnd)
       return read_token();
+
+    // Avoid EndOfExpression on BlockEnd
+    if (bol && c == ' ') {
+      maybe_expend = true;
+      return read_token();
+    }
 
     return last_token = Token::EndOfExpression;
   }

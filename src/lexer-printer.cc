@@ -18,6 +18,15 @@ int main(int argc, char* argv[])
   do {
     token = lexer.read_token();
     switch (token) {
+    case Token::Double:
+      std::cout << prefix << "<double>" << lexer.float_value() << "</double>" << std::endl;
+      break;
+    case Token::Long:
+      std::cout << prefix << "<long>" << lexer.int_value() << "</long>" << std::endl;
+      break;
+    case Token::Int:
+      std::cout << prefix << "<int>" << lexer.int_value() << "</int>" << std::endl;
+      break;
     case Token::Variable:
       std::cout << prefix << "<var>" << lexer.variable_name() << "</var>" << std::endl;
       break;

@@ -8,6 +8,9 @@ namespace tencatl {
   
 enum class Token {
   NoToken,
+  Double,
+  Long,
+  Int,
   Variable,
   Symbol,
   Operator,
@@ -40,6 +43,12 @@ public:
 
   const std::string& oper() const
   { return last_oper; }
+
+  long int_value() const
+  { return last_int; }
+  
+  double float_value() const
+  { return last_float; }
   
 private:
   //// Input stream.
@@ -69,8 +78,10 @@ private:
   /// Name of the last variable token.
   std::string last_var;
   std::string last_oper;
-  /// Name of the last variable token.
+    /// Name of the last variable token.
   char last_sym;
+  double last_float;
+  long last_int;
   
   char opening_brace[128];
 
