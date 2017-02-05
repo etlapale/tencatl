@@ -1,0 +1,14 @@
+# Kaleidoscope example 1 — Recursive Fibonacci function
+
+import libc
+
+# Recursively define the Fibonacci function
+def fib (x : int)
+  if x < 3
+    1
+  else
+    fib (x - 1) + fib (x - 2)
+
+# Call it and print the result
+def main
+  printf("%d\n", fib (40))

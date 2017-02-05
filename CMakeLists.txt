@@ -17,6 +17,11 @@ if (NOT CMAKE_BUILD_TYPE)
     FORCE)
 endif ()
 
+# Verbose warnings
+if (CMAKE_CXX_COMPILER_ID MATCHES "^(Clang|GNU)$")
+  add_compile_options(-Wall -Wextra -Wshadow -pedantic)
+endif ()
+
 # Use architecture-specific optimization in Release mode
 if (CMAKE_BUILD_TYPE MATCHES "^(Release|RelWithDebInfo)$")
   if (CMAKE_CXX_COMPILER_ID MATCHES "^(Clang|GNU)$")
@@ -48,8 +53,16 @@ macro(add_tencatl_lib NAME SRC)
   endif ()
 endmacro()
 
+include_directories(${PROJECT_SOURCE_DIR}/include)
+
 # Build the libraries
 add_tencatl_lib(lexer src/lexer.cc)
+
+# Test executables
+add_executable(lexer-printer src/lexer-printer.cc)
+target_link_libraries(lexer-printer lexer)
+
+enable_testing()
 
 # Install the headers
 install(DIRECTORY include/tencatl
