@@ -14,23 +14,26 @@ int main(int argc, char* argv[])
   tencatl::Lexer lexer(argv[1]);
   
   Token token;
+  std::string prefix;
   do {
     token = lexer.read_token();
     switch (token) {
-    case Token::VARIABLE:
-      std::cout << "<var>" << lexer.variable_name() << "</var>" << std::endl;
+    case Token::Variable:
+      std::cout << prefix << "<var>" << lexer.variable_name() << "</var>" << std::endl;
       break;
-    case Token::SYMBOL:
-      std::cout << "<sym>" << lexer.symbol() << "</sym>" << std::endl;
+    case Token::Symbol:
+      std::cout << prefix << "<sym>" << lexer.symbol() << "</sym>" << std::endl;
       break;
-    case Token::END_OF_EXPRESSION:
+    case Token::EndOfExpression:
       std::cout << std::endl;
+      break;
+    case Token::BlockBegin:
+      prefix += "  ";
       break;
     default:
       std::cerr << "Unknown token!" << std::endl;
     }
-  } while (token != Token::END_OF_FILE
-	   && token != Token::ERROR);
+  } while (token != Token::EndOfFile);
   
   return 0;
 }

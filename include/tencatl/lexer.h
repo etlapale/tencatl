@@ -1,17 +1,19 @@
 #pragma once
 
 #include <memory>
+#include <queue>
 #include <stack>
 
 namespace tencatl {
   
 enum class Token {
-  VARIABLE,
-  SYMBOL,
-  END_OF_EXPRESSION,
-  END_OF_FILE,
-  ERROR,
-  NO_TOKEN
+  NoToken,
+  Variable,
+  Symbol,
+  EndOfExpression,
+  BlockBegin,
+  BlockEnd,
+  EndOfFile
 };
 
 class Lexer
@@ -38,18 +40,28 @@ public:
 private:
   //// Input stream.
   std::unique_ptr<std::istream> is;
-  /// Current character being read.
-  char c;
   /// Current input filename.
   std::string filename;
+  
+  /// Current character being read.
+  char c;
   /// Whether we are at the beginning of a line.
   bool bol = true;
   /// Whether the end of file was read.
   bool eofed = false;
   /// Braces context.
   std::stack<char> braces;
+  // Indentation stack.
+  std::stack<std::size_t> indent;
+  // Number of closing blocks to be generated
+  std::size_t closing_blocks;
+  // Tokens to be emitted in the future.
+  std::queue<Token> to_emit;
+  bool maybe_expend = false;
+  std::size_t skipped_blocks = 0;
+  
   /// Last returned token.
-  Token last_token = Token::NO_TOKEN;
+  Token last_token = Token::NoToken;
   /// Name of the last variable token.
   std::string last_var;
   /// Name of the last variable token.
