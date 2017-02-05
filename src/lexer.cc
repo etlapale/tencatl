@@ -24,6 +24,14 @@ static bool isvar(char c)
     || ('0' <= c && c <= '9');
 }
 
+static bool isop(char c)
+{
+  return c == '+' || c == '-' || c == '/' || c == '*' || c == '%'
+    || c == '<' || c == '>' || c == '=' || c == '!'
+    || c == '&' || c == '|'
+    || c == ':';
+}
+
 
 Lexer::Lexer(const std::string& path)
   : is(new std::ifstream(path))
@@ -156,6 +164,27 @@ Token Lexer::read_token()
 
     last_var = buf.str();
     return last_token = Token::Variable;
+  }
+  
+  // Operator
+  if (isop(c)) {
+    std::stringstream buf;
+    buf << c;
+    while (isop(get_char()))
+      buf << c;
+    auto name = buf.str();
+    
+    // Special cases
+    if (name.size() == 1
+	&& std::string("=:+-~!").find(name[0]) != std::string::npos) {
+      last_sym = name[0];
+      return last_token = Token::Symbol;
+    }
+    if (name == ";")
+      return last_token = Token::EndOfExpression;
+
+    last_oper = name;
+    return last_token = Token::Operator;
   }
   
   // Handle end of files

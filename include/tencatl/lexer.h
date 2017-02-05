@@ -10,6 +10,7 @@ enum class Token {
   NoToken,
   Variable,
   Symbol,
+  Operator,
   EndOfExpression,
   BlockBegin,
   BlockEnd,
@@ -36,6 +37,9 @@ public:
 
   char symbol() const
   { return last_sym; }
+
+  const std::string& oper() const
+  { return last_oper; }
   
 private:
   //// Input stream.
@@ -64,9 +68,10 @@ private:
   Token last_token = Token::NoToken;
   /// Name of the last variable token.
   std::string last_var;
+  std::string last_oper;
   /// Name of the last variable token.
   char last_sym;
-
+  
   char opening_brace[128];
 
   /**

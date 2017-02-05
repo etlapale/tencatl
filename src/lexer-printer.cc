@@ -24,6 +24,9 @@ int main(int argc, char* argv[])
     case Token::Symbol:
       std::cout << prefix << "<sym>" << lexer.symbol() << "</sym>" << std::endl;
       break;
+    case Token::Operator:
+      std::cout << prefix << "<op>" << lexer.oper() << "</op>" << std::endl;
+      break;
     case Token::EndOfExpression:
       std::cout << std::endl;
       break;
