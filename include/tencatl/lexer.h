@@ -73,7 +73,7 @@ private:
   // Indentation stack.
   std::stack<std::size_t> indent;
   // Number of closing blocks to be generated
-  std::size_t closing_blocks;
+  std::size_t closing_blocks = 0;
   // Tokens to be emitted in the future.
   std::queue<Token> to_emit;
   bool maybe_expend = false;

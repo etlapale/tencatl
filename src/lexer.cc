@@ -101,8 +101,8 @@ Lexer::Lexer(const std::string& path)
 char Lexer::get_char()
 {
   is->get(c);
-  std::cout << "  << Read ‘" << c << "’ ("
-	    << static_cast<int>(c) << ")" << std::endl;
+  //std::cout << "  << Read ‘" << c << "’ ("
+  //<< static_cast<int>(c) << ")" << std::endl;
   return c;
 }
 
