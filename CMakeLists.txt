@@ -5,9 +5,9 @@ project (Tēncatl
   LANGUAGES CXX)
 
 # Specify strict C++14 standard
-set(CXX_STANDARD 14)
-set(CXX_STANDARD_REQUIRED ON)
-set(CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Build type default set to Release
 if (NOT CMAKE_BUILD_TYPE)
