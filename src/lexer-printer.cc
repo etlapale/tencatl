@@ -37,10 +37,13 @@ int main(int argc, char* argv[])
       std::cout << prefix << "<op>" << lexer.oper() << "</op>" << std::endl;
       break;
     case Token::EndOfExpression:
-      std::cout << std::endl;
+      std::cout << prefix << "<expend/>\n" << std::endl;
       break;
     case Token::BlockBegin:
       prefix += "  ";
+      break;
+    case Token::BlockEnd:
+      prefix = prefix.substr(2);
       break;
     default:
       std::cerr << "Unknown token!" << std::endl;

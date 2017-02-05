@@ -53,7 +53,7 @@ Lexer::Lexer(const std::string& path)
 char Lexer::get_char()
 {
   is->get(c);
-  //std::cout << "Read ‘" << c << "’" << std::endl;
+  //std::cout << "  << Read ‘" << c << "’" << std::endl;
   return c;
 }
 
@@ -98,7 +98,18 @@ Token Lexer::read_token()
   
   // Skip empty lines
   if (bol && c == '\n')
-    c = get_char();
+    get_char();
+
+  // Close all the indentation blocks
+  if (indent.size()
+      && ((bol && c != ' ') || (is->eof() && indent.size()))) {
+    closing_blocks = indent.size();
+    
+    while (indent.size()) indent.pop();
+    bol = false;
+    
+    return read_token();
+  }
   
   // Indentation: only spaces
   if (bol && c == ' ') {
