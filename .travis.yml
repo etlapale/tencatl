@@ -11,6 +11,7 @@ addons:
       - cmake-data
       - g++-5
       - gcc-5
+      - libboost-all-dev
 install:
   - if [ "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5"; fi
   - if [ "$CXX" = "clang++" ]; then export CXX="clang++-3.9" CC="clang-3.9"; fi
