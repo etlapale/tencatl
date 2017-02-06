@@ -37,7 +37,6 @@ if (NOT ${BUILD_STATIC_LIBS} AND NOT ${BUILD_SHARED_LIBS})
 endif ()
 
 # Dependencies
-find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 
 # Convenience macro to build the libraries
 macro(add_tencatl_lib NAME SRC)
@@ -67,6 +66,7 @@ target_link_libraries(lexer-printer lexer)
 
 # Unit tests
 enable_testing()
+find_package(GTest REQUIRED)
 add_subdirectory(tests)
 
 # Install the headers

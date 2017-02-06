@@ -11,15 +11,24 @@ addons:
       - cmake-data
       - g++-5
       - gcc-5
-      - libboost-all-dev
-install:
+      - python-pip
+      - libgtest-dev
+before_install:
+  - sudo apt-get update -qq
+  - mkdir build && cd build
   - if [ "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5"; fi
   - if [ "$CXX" = "clang++" ]; then export CXX="clang++-3.9" CC="clang-3.9"; fi
+  - wget https://github.com/google/googletest/archive/release-1.8.0.tar.gz
+  - tar xf release-1.8.0.tar.gz && cd googletest-release-1.8.0
+  - cmake -DBUILD_SHARED_LIBS=ON . && make && sudo make install
+  - cd ..
+install:
 compiler:
   - clang
   - gcc
 before_script:
-  - cmake -DCMAKE_INSTALL_PREFIX=install .
+  - cmake -DCMAKE_INSTALL_PREFIX=install ..
 script:
   - make VERBOSE=1
+  - ctest
   - make install

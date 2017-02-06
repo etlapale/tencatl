@@ -1,29 +1,37 @@
-#include <boost/test/included/unit_test.hpp>
+#include <memory>
 
-#define BOOST_TEST_MODULE Tēncatl Lexer Tests
-#include <boost/test/included/unit_test.hpp>
+#include <gtest/gtest.h>
 
 #include <tencatl/lexer.h>
 
-boost::unit_test::test_suite* init_unit_test_suite(int /*argc*/,
-						   char* /*argv*/[])
-{
-  return 0;
-}
 
-BOOST_AUTO_TEST_CASE(test_lexer_create)
+TEST(TestLexer, CreateForFile)
 {
   tencatl::Lexer lexer(TENCATL_TEST_DIR "fragments/empty.te");
 }
 
-BOOST_AUTO_TEST_CASE(test_lexer_empty)
+TEST(TestLexer, LexEmptyFile)
 {
   tencatl::Lexer lexer(TENCATL_TEST_DIR "fragments/empty.te");
 
   // Lexing and empty file should return EOF
   auto token = lexer.read_token();
-  BOOST_TEST(token == tencatl::Token::EndOfFile);
+  EXPECT_EQ(token, tencatl::Token::EndOfFile);
 
   // Reading after the end of file should throw
-  BOOST_CHECK_THROW(lexer.read_token(), std::runtime_error);
+  EXPECT_THROW(lexer.read_token(), std::runtime_error);
+}
+
+TEST(TestLexer, LexEmptyString)
+{
+  std::string input("");
+  tencatl::Lexer lexer;
+  lexer.set_source(std::make_unique<std::istringstream>(input));
+
+  // Lexing and empty file should return EOF
+  auto token = lexer.read_token();
+  EXPECT_EQ(token, tencatl::Token::EndOfFile);
+
+  // Reading after the end of file should throw
+  EXPECT_THROW(lexer.read_token(), std::runtime_error);
 }

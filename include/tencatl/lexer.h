@@ -26,10 +26,14 @@ std::ostream& operator<<(std::ostream& os, Token token);
 class Lexer
 {
 public:
+  Lexer();
+  
   /**
    * Create a lexer for the given input file.
    */
   Lexer(const std::string& path);
+
+  void set_source(std::unique_ptr<std::istream> input);
 
   /// Read the next token from the input stream.
   Token read_token();

@@ -81,20 +81,37 @@ std::ostream& operator<<(std::ostream& os, Token token)
 }
 
 
+Lexer::Lexer()
+{
+  // Initialise the braces
+  opening_brace[')'] = '(';
+  opening_brace[']'] = '[';
+  opening_brace['}'] = '{';
+}
+
+
 Lexer::Lexer(const std::string& path)
   : is(new std::ifstream(path))
 {
   if (! is->good())
     throw std::runtime_error("could not open " + path);
-
-  // Initialize the state
-  filename = path;
-  get_char();
   
   // Initialise the braces
   opening_brace[')'] = '(';
   opening_brace[']'] = '[';
   opening_brace['}'] = '{';
+
+  // Initialize the state
+  filename = path;
+  get_char();
+}
+
+void Lexer::set_source(std::unique_ptr<std::istream> input)
+{
+  is = std::move(input);
+
+  filename = "";
+  get_char();
 }
 
 
