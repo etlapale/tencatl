@@ -76,3 +76,39 @@ TEST(TestLexer, LexFib)
   ASSERT_GE(tokens.size(), truth.size());
   EXPECT_TRUE(equal(truth.cbegin(), truth.cend(), tokens.cbegin()));
 }
+
+TEST(TestLexer, LexFileFib)
+{
+  using tencatl::Token;
+  
+  tencatl::Lexer lexer(TENCATL_TEST_DIR "kaleidoscope/kal-1.te");
+
+  std::vector<tencatl::Token> truth {
+    // import · libc · ;
+    Token::Variable, Token::Variable, Token::EndOfExpression,
+    // def · fib · (
+    Token::Variable, Token::Variable, Token::Symbol,
+    // x · : · int
+    Token::Variable, Token::Symbol, Token::Variable,
+    // ) · → · if
+    Token::Symbol, Token::BlockBegin, Token::Variable,
+    // x · < · 3
+    Token::Variable, Token::Operator, Token::Int,
+    // → · 1 · ;
+    Token::BlockBegin, Token::Int, Token::EndOfExpression,
+    // ← · else · →
+    Token::BlockEnd, Token::Variable, Token::BlockBegin,
+    // fib · ( · x
+    Token::Variable, Token::Symbol, Token::Variable
+  };
+
+  std::vector<tencatl::Token> tokens;
+  tencatl::Token token;
+  do {
+    token = lexer.read_token();
+    tokens.push_back(token);
+  } while (token != tencatl::Token::EndOfFile);
+  ASSERT_GE(tokens.size(), truth.size());
+  ASSERT_GE(tokens.size(), truth.size());
+  EXPECT_TRUE(equal(truth.cbegin(), truth.cend(), tokens.cbegin()));
+}
